@@ -7,7 +7,7 @@
     <meta name="description" content="キャリ爺とAIお助けマンと進める15日間の面接道場">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon-192.png">
-    <title>面接対策 15日間プログラム (キャリ爺版)</title>
+    <title>面接対策 15日間プログラム</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -245,6 +245,17 @@
         /* --- ★ここまで★ --- */
 
 
+        /* --- ★★★【追加】通常モード用CSS ★★★ --- */
+        /* 通常モードが選択された際、キャリ爺の吹き出し関連を非表示にする */
+        body.normal-mode .chara-container {
+            display: none;
+        }
+        body.normal-mode .balloon {
+            display: none;
+        }
+        /* --- ★★★ ここまで ★★★ */
+
+
         @media (max-width: 768px) {
             body {
                 padding: 10px;
@@ -271,9 +282,6 @@
                 justify-content: space-around;
                 width: 100%;
                 padding: 8px;
-            }
-            #questions-list-daily, #questions-list-core, #questions-list-key, #questions-list-good {
-                display: none !important;
             }
             
             /* スマホ用にアイコンと吹き出しのサイズ調整 */
@@ -308,9 +316,29 @@
 </head>
 <body>
 
-    <audio id="intro-audio" src="introduction.mp3"></audio>
+    <div id="mode-select-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex justify-center items-center z-50">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl text-center max-w-lg mx-4">
+            <h2 class="text-3xl font-bold text-indigo-700 mb-4">ようこそ！</h2>
+            <p class="text-gray-600 mb-8 text-lg">どちらの音声ガイドで学習を始めますか？</p>
+            <div class="flex flex-col sm:flex-row gap-6">
+                <button id="select-kyarijii" class="flex-1 p-6 bg-indigo-50 hover:bg-indigo-100 border-2 border-indigo-200 rounded-xl transition transform hover:scale-105">
+                    <div class="text-5xl mb-3">👴</div>
+                    <h3 class="text-xl font-bold text-indigo-600">キャリ爺 (笑) パターン</h3>
+                    <p class="text-gray-500 mt-1">キャリ爺がコミカルにガイドするんじゃ！</p>
+                </button>
+                <button id="select-normal" class="flex-1 p-6 bg-gray-50 hover:bg-gray-100 border-2 border-gray-200 rounded-xl transition transform hover:scale-105">
+                    <div class="text-5xl mb-3">👩‍🏫</div>
+                    <h3 class="text-xl font-bold text-gray-700">通常パターン</h3>
+                    <p class="text-gray-500 mt-1">標準的な音声で真面目に学習します。</p>
+                </button>
+            </div>
+        </div>
+    </div>
+    <audio id="intro-audio"></audio>
     <audio id="main-audio"></audio>
-
+    
+    <!-- 修正: 外部ファイル依存のアラート音を削除 -->
+    <!-- <audio id="timer-alert-audio" src="timer_alert.mp3" preload="auto"></audio> -->
     <div class="container">
         
         <aside>
@@ -352,19 +380,19 @@
 
         <main class="w-full">
             <header class="card text-center">
-                <!-- ★ヘッダーのトーンを変更★ -->
-                <h1 class="text-3xl font-bold text-indigo-700">キャリ爺の面接道場</h1>
-                <p class="text-gray-500 mt-1">15日間の修行で、最強の面接スキルを手に入れるんじゃ！</p>
+                <h1 class="text-3xl font-bold text-indigo-700"></h1>
+                <p class="text-gray-500 mt-1"></p>
                 
                 <div class="mt-4 flex flex-col items-center">
                     <h2 class="text-xl font-semibold mb-2">
                         音声ガイド(はじめに)
                         <br>
-                        <span style="color: blue;">★</span>
-                        <span style="color: red;">注意</span>
-                        <span style="color: blue;">★各日程の音声ガイドを再生する場合は、この説明音声を</span>
-                        <span style="color: red;">stop</span>
-                        <span style="color: blue;">するんじゃぞ。★</span>
+                        <span id="audio-warning" class="hidden" style="color: blue;">
+                            ★<span style="color: red;">注意</span>★
+                            各日程の音声ガイドを再生する場合は、この説明音声を
+                            <span style="color: red;">stop</span>
+                            するんじゃぞ。★
+                        </span>
                     </h2>
                     <div class="flex items-center gap-4">
                         <button id="play-intro" class="bg-indigo-500 hover:bg-indigo-600 text-white p-3 rounded-full transition duration-150 shadow-md">
@@ -379,6 +407,18 @@
                         </div>
                     </div>
                 </div>
+                
+                <div class="mt-6 border-t pt-5">
+                    <h2 class="text-xl font-semibold mb-2 text-blue-600">
+                        <i class="fas fa-random"></i> 実践！模擬面接モード・１５日間の対策をおえたらチャレンジ
+                    </h2>
+                    <p class="text-gray-500 text-sm mb-4" id="practice-description">
+                        準備ができたら、ランダムな質問（全3問）で本番の練習をするんじゃ！
+                    </p>
+                    <button id="start-practice-mode" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg transition duration-150 shadow-md text-lg">
+                        実践練習をスタート
+                    </button>
+                </div>
             </header>
             
             <div class="card p-3">
@@ -388,16 +428,21 @@
                 </div>
                 <p id="progress-text" class="text-right text-sm text-gray-500 mt-1">0/15 日完了</p>
                 
-                <!-- --- ★成長ビジュアルのHTMLを追加★ --- -->
                 <div class="mt-4 flex items-center gap-4 p-3 bg-green-50 rounded-lg border border-green-200">
                     <div id="growth-icon" class="text-5xl">🌱</div>
                     <div>
-                        <p id="growth-text" class="text-gray-700 font-semibold">修行が始まったぞ！まずは種まきじゃ！</p>
+                        <p id="growth-text" class="text-gray-700 font-semibold"></p>
                         <p class="text-sm text-gray-500">（進捗: <span id="progress-percent">0</span>%）</p>
                     </div>
                 </div>
-                <!-- --- ★ここまで★ --- -->
 
+                <!-- ★★★ 追加: 進捗リセットボタン ★★★ -->
+                <div class="mt-6 pt-4 border-t border-gray-200 text-center">
+                    <button id="reset-data-button" class="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-lg transition duration-150 shadow-sm text-sm">
+                        <i class="fas fa-trash-alt mr-2"></i> 進捗データをリセット
+                    </button>
+                </div>
+                <!-- ★★★ ここまで ★★★ -->
             </div>
 
             <div id="content-container">
@@ -406,14 +451,35 @@
     </div>
 
 <script>
-// データ定義
-// --- ★ 構文エラーを修正: questionsData の全データを復元 ★ ---
+let currentAudioMode = 'kyarijii';
+
+// Web Audio APIのコンテキストを初期化
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+// ★★★【追加】実践練習モード用のグローバル変数 ★★★
+let practiceQuestions = [];
+let currentPracticeIndex = 0;
+let practiceTimerInterval = null;
+let practiceTimerSeconds = 60;
+// 質問の対象日 (Day 13:逆質問, Day 15:振り返り を除外)
+const practiceQuestionPool = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14];
+// ★★★ ここまで ★★★
+
+// ★★★【追加】実践練習モード用のDOM参照 ★★★
+// (DOMContentLoaded内で定義されるため、ここでは宣言しない)
+let startPracticeBtn, practiceModal, practiceQuestionCount, practiceQuestionTitle;
+let practiceTimer, practiceTimerBar, stopPracticeBtn, nextPracticeBtn;
+// 修正: timerAlertAudio を削除
+
+// ★★★ `example_detailed` のデータをすべて復元（Day 4を改善） ★★★
 const questionsData = {
     0: {
         title: "はじめに (プログラム紹介)",
-        audio_source: "introduction.mp3",
+        audio_sources: {
+            kyarijii: "introduction.mp3",
+            normal: "introduction_normal.mp3"
+        }
     },
-    // --- ★ 全ての日付にキャラクター用データを追加 ★ ---
     1: {
         title: "#1日目# 自己紹介をお願いします",
         chara_lead_title: "キャリ爺じゃ！",
@@ -431,7 +497,10 @@ const questionsData = {
         },
         checklist: ["時間内に収まるか確認した", "結論から述べられているか確認した", "入社意欲が伝わるか確認した"],
         prompt_focus: "【自己紹介へのフィードバック依頼】\n[質問: 自己紹介をお願いします]\n\n以下の私の回答に対して、面接官がさらに深掘りしたくなるような「キーワード」が含まれているか、また、回答が簡潔で分かりやすいかについてフィードバックをください。",
-        audio_source: "day1_guidance.mp3",
+        audio_sources: {
+            kyarijii: "day1_guidance.mp3",
+            normal: "day1_normal.mp3"
+        }
     },
     2: {
         title: "#2日目# 学生時代に最も打ち込んだことは何ですか?",
@@ -451,9 +520,12 @@ const questionsData = {
             "ボランティアパターン": "地域NPO法人での子供向け学習支援ボランティアのリーダー経験です。**[状況]** 担当した学習プログラムで、参加している中学生の宿題完了率が非常に低く(平均30%)、学習意欲の低下が見られました。**[課題]** 楽しく継続できる学習環境を作り、宿題完了率を改善することを目指しました。**[行動]** 私は一方的な指導ではなく、中学生自身が「教える側」になる**ピア・サポート制度を提案**し、導入しました。また、進捗を可視化する独自のスタンプラリー制度を考案しました。**[結果]** 制度導入後、中学生のプログラムへの**欠席率が半減**し、3ヶ月で宿題完了率を**85%まで向上**させることができました。",
             "長期インターンパターン": "ITスタートアップ企業でのマーケティング長期インターン経験です。**[状況]** 企業が提供するSaaSプロダクトの新規リード獲得数が伸び悩み、特にWebサイト経由の獲得率が業界平均を下回っていました。**[課題]** WebサイトのCVR(顧客転換率)を改善し、リード獲得数を増やすことにコミットしました。**[行動]** Google Analyticsなどのデータに基づき、ユーザーの離脱ポイントを特定し、ターゲットペルソナに合わせた**LP(ランディングページ)のコピーライティングとUI/UXの改善を提案**しました。また、A/Bテストを週次で実施し、効果測定を行いました。**[結果]** 6ヶ月間のインターン期間で、Webサイト経由のCVRを**約2.5倍に改善**し、月間の新規リード獲得数に貢献しました。"
         },
-        checklist: ["具体的な課題を説明できたか", "自分の具体的な行動を説明できたか", "入社後の仕事にどう活かせるか述べたか"],
-        prompt_focus: "【ガクチカへのフィードバック依頼】\n[質問: 学生時代に最も打ち込んだことは何ですか?]\n\n以下の私の回答に対して、STAR法(状況・課題・行動・結果)に基づき、論理的な一貫性があるか、また、面接官がその行動から私のどのような強みを読み取れるかについてフィードバックをください。",
-        audio_source: "day2_guidance.mp3",
+        checklist: ["時間内に収まるか確認した", "結論から述べられているか確認した", "入社意欲が伝わるか確認した"],
+        prompt_focus: "【自己紹介へのフィードバック依頼】\n[質問: 自己紹介をお願いします]\n\n以下の私の回答に対して、面接官がさらに深掘りしたくなるような「キーワード」が含まれているか、また、回答が簡潔で分かりやすいかについてフィードバックをください。",
+        audio_sources: {
+            kyarijii: "day1_guidance.mp3",
+            normal: "day1_normal.mp3"
+        }
     },
     3: {
         title: "#3日目# あなたの自己PRを教えてください",
@@ -483,7 +555,10 @@ const questionsData = {
         },
         checklist: ["強みを一つに絞れた", "強みとエピソードに一貫性がある", "入社後の貢献イメージを明確にした"],
         prompt_focus: "【自己PRへのフィードバック依頼】\n[質問: あなたの自己PRを教えてください]\n\n以下の私の回答に対して、強みの具体性、説得力、そしてそれが応募企業の業務でどのように活かせるかの結びつきについて、面接官視点でのフィードバックをください。",
-        audio_source: "day3_guidance.mp3",
+        audio_sources: {
+            kyarijii: "day3_guidance.mp3",
+            normal: "day3_normal.mp3"
+        }
     },
     4: {
         title: "#4日目# 志望動機を教えてください",
@@ -497,13 +572,18 @@ const questionsData = {
         points: ["競合他社ではなく、なぜこの会社なのかを明確にする。", "企業のミッションやバリューに共感する点を具体的に述べる。", "入社後に自分がどう貢献できるか、キャリアプランと結びつける。"],
         example_simple: "貴社の「〇〇を通じて社会に貢献する」という理念に強く共感し、私の△△というスキルを活かして貢献したいと考えております。",
         example_detailed: {
-            '製品・サービスへの共感パターン': "貴社の開発された△△(製品名)の利用者として、その革新的な技術に感銘を受けました。今度は、その感動を提供する側として、技術の発展に携わりたいと考え、志望いたしました。",
-            '企業文化への共感パターン': "貴社のオープンで挑戦的な社風に魅力を感じました。私の持つ「自発的に行動する力」は、特に貴社の△△部門で活かせると確信しています。このような環境でこそ、最大限のパフォーマンスを発揮できると考えています。",
-            'キャリアの接続性パターン': "前職で培った〇〇の経験を、さらに規模の大きな貴社の事業で活かしたいと考えております。特に、貴社が注力されている△△領域は、私のキャリアビジョンと完全に一致しています。"
+            // ★★★ 志望動機の回答例を大幅に強化 ★★★
+            '市場の課題解決型パターン': "**[結論]** 私は、貴社が掲げる『情報格差をゼロにする』というミッションに、学生時代に培った『課題発見力』を活かし貢献したいと考え志望いたしました。**[Why Industry]** 私は長期インターンで、地方におけるデジタルサービスの浸透の遅れを目の当たりにし、この社会課題の解決に人生を費やしたいと決意しました。**[Why Company]** 数多くの企業の中で、貴社は唯一、**地域特化型のDX支援サービス**に注力されており、その事業戦略に強く共感しております。**[How I Contribute]** 私の強みである、顧客の潜在ニーズを深掘りするヒアリング力を活かし、地域のお客様に本当に必要なソリューションを提供することで、貴社の市場シェア拡大に貢献します。",
+            '製品・技術特化型パターン': "**[結論]** 貴社のAI技術を駆使した革新的な医療診断システムに感銘を受け、この技術をさらに発展させるエンジニアとして貢献したいと強く志望しております。**[Why Industry]** 私の研究テーマである『高精度画像認識アルゴリズム』は、特に医療分野での貢献を目標としてきました。**[Why Company]** 貴社は、この分野で**国内トップクラスの特許数**を持ち、その研究環境と最先端の技術力は、私のキャリアビジョンを実現するための最適な場だと確信しています。**[How I Contribute]** 研究で培った高度なプログラミングスキルと粘り強さをもって、入社後は**新バージョンの開発チーム**に早期に参画し、システム精度の向上に貢献します。",
+            '企業文化と挑戦型パターン': "**[結論]** 貴社の『失敗を恐れず、常に市場に新しい価値を提供する』という挑戦的な企業文化に魅力を感じ、私の『積極的な実行力』を最大限に活かせると確信しています。**[Why Industry]** 私は、変化の激しい現代において、既存の枠にとらわれないサービスこそが人々の生活を豊かにすると考えます。**[Why Company]** 特に貴社の新規事業提案制度は、若手にも積極的にチャンスを与えるものであり、私のアイデアを形にする土壌があると感じました。**[How I Contribute]** 持ち前の行動力で、入社後すぐにこの制度を活用し、貴社の新規顧客獲得のための**革新的なプロモーション企画**を立案・実行することで、事業の多様化に貢献します。"
+            // ★★★ 志望動機の回答例を大幅に強化（ここまで） ★★★
         },
         checklist: ["「なぜこの会社か」を明確にできた", "企業研究の結果を示せた", "入社後のビジョンを語れた"],
         prompt_focus: "【志望動機へのフィードバック依頼】\n[質問: 志望動機をお聞かせください]\n\n以下の私の回答に対して、論理の一貫性、熱意の伝わりやすさ、そして回答が競合他社でも通用する内容になっていないか(独自性があるか)を確認してください。",
-        audio_source: "day4_guidance.mp3",
+        audio_sources: {
+            kyarijii: "day4_guidance.mp3",
+            normal: "day4_normal.mp3"
+        }
     },
     5: {
         title: "#5日目# 入社後に活かせるスキルや経験は何ですか?",
@@ -519,11 +599,14 @@ const questionsData = {
         example_detailed: {
             '専門スキル(ITなど)パターン': "前職のシステム開発において、特にデータベース設計の経験が豊富です。貴社の新プロジェクトにおける△△の業務において、この設計スキルを活かし、初期段階から貢献できると確信しています。",
             '対人スキル(営業・接客)パターン': "お客様の潜在的なニーズを引き出すヒアリング力です。前職の営業職では、このヒアリング力を活かし、お客様一人ひとりに最適な提案を行うことで、平均売上の15%向上を達成しました。",
-            '汎用スキル(PC・言語)パターン': "高いレベルのPCスキルと、英語でのコミュニケーション能力です。特にExcelやPowerPointを駆D$uした資料作成や分析作業は、効率よく行える自信があり、海外支社とのやり取りにも貢献できます。"
+            '汎用スキル(PC・言語)パターン': "高いレベルのPCスキルと、英語でのコミュニケーション能力です。特にExcelやPowerPointを駆使した資料作成や分析作業は、効率よく行える自信があり、海外支社とのやり取りにも貢献できます。"
         },
         checklist: ["応募職種に必要なスキルを挙げた", "スキルを裏付ける具体的なエピソードがある", "入社後の貢献イメージが具体的である"],
         prompt_focus: "【活かせるスキルへのフィードバック依頼】\n[質問: 入社後に活かせるスキルや経験は何ですか?]\n\n以下の私の回答に対して、応募職種の必須要件とのマッチ度、スキルを裏付けるエピソードの具体性、そして過度に自己評価が高くないかについてフィードバックをください。",
-        audio_source: "day5_guidance.mp3",
+        audio_sources: {
+            kyarijii: "day5_guidance.mp3",
+            normal: "day5_normal.mp3"
+        }
     },
     6: {
         title: "#6日目# 成功体験と失敗体験を教えてください",
@@ -545,7 +628,10 @@ const questionsData = {
         },
         checklist: ["成功と失敗の両方を具体的に語れた", "失敗を他人のせいにしなかった", "失敗から得た教訓を仕事に結びつけた"],
         prompt_focus: "【成功・失敗体験へのフィードバック依頼】\n[質問: 成功体験と失敗体験を教えてください]\n\n以下の私の回答に対して、成功体験の再現性、失敗体験からの学びの深さ、そして両者のバランスが取れているかについてフィードバックをください。",
-        audio_source: "day6_guidance.mp3",
+        audio_sources: {
+            kyarijii: "day6_guidance.mp3",
+            normal: "day6_normal.mp3"
+        }
     },
     7: {
         title: "#7日目# あなたが他者を巻き込んで何かを成し遂げた経験を話してください",
@@ -559,15 +645,18 @@ const questionsData = {
         points: ["目標達成のために、チームメンバーにどう働きかけたかを具体的に説明する。", "自分の役割だけでなく、他者の貢献を認識していることを示す。", "意見が対立した際に、どのように合意形成を図ったかを説明する。"],
         example_simple: "サークルのイベントで、メンバーの協力を得て企画を成功させました。特に、困難な場面でメンバーの士気を高める役割を担いました。",
         example_detailed: {
-            "合意形成型パターン": "(エピソード)アルバイト先で新メニュー開発に携わった際、意見の異なる他部署のメンバーを巻き込む必要がありました。私は定期的な合同会議を設定し、共通の顧客利益という目標を再確認することで、建設的な議論を促し、最終的に新メニューを大ヒットさせました。",
+            "合意形成型パターン": "(エピソード)アルバイト先で新メニュー開発に携わった際、意見の異なる他部署のメンバーを巻き込む必要がありました。私は定期的な合同会議を設定し,共通の顧客利益という目標を再確認することで,建設的な議論を促し,最終的に新メニューを大ヒットさせました。",
             "士気向上・貢献型パターン": "(エピソード)大学のゼミでチーム研究を行った際、テーマの難易度が高く、メンバーのモチベーションが低下していました。私はまず、**メンバー一人ひとりの得意分野と興味**をヒアリング。その強みを最大限に活かせる役割に再配置し、小さな成功を共有する場を設けて**達成感を積み重ね**ました。その結果、チームの士気が回復し、研究を**学会発表**まで漕ぎ着けることができました。",
             "利害調整・橋渡し型パターン": "(エピソード)地域ボランティア活動の企画・運営において、若手とベテランの間で活動方針に関する**意見の対立**が生じました。私は一方的な判断をせず、双方の意見を丁寧に聞き、ベテランの**「経験に基づく慎重さ」**と若手の**「新しい手法への意欲」**を対立ではなく、**リスクヘッジと革新**という形で統合するハイブリッドな計画を提案。これにより、全員が納得する形でプロジェクトを前進させることができました。",
-            "新規ルール浸透・改革型パターン": "(エピソード)カフェでのアルバイトで、新人研修後の定着率が低いという課題に直面しました。私は、「マニュアルの複雑さ」が原因だと特定し、店長に働きかけ、**現場主導の新人サポート制度**の導入を提案。経験豊富なアルバイト(先輩)たちを「メンター」として巻き込み、OJT(オンザジョブトレーニング)を仕組み化しました。結果、新人の不安が解消され、研修後の**定着率を半年で20%改善**させることができました。",
+            "新規ルール浸透・改革型パターン": "(エピソード)カフェでのアルバイトで、新人研修後の定着率が低いという課題に直面しました。私は、「マニュアルの複雑さ」が原因だと特定し、店長に働きかけ、**現場主導の新人サポート制度**の導入を提案。経験豊富なアルバイト(先輩)たちを「メンター」として巻き込み,OJT(オンザジョブトレーニング)を仕組み化しました。結果、新人の不安が解消され、研修後の**定着率を半年で20%改善**させることができました。",
             "目標共有・全体最適型パターン": "(エピソード)テニスサークルの部長として、練習参加率の低下という課題に直面しました。私はまず、サークル全体で**「〇〇大会優勝」という具体的な目標**を掲げ、メンバー全員との面談を通じて**目標に対するコミットメント**を引き出しました。そして、目標達成のために必要な個人レベルの成長プランを共有することで、**『自分の練習がチームに貢献する』**という意識を浸透させ、サークル全体を巻き込み、練習参加率と実力向上を両立させました。"
         },
         checklist: ["巻き込みの目標を明確にした", "具体的な働きかけを説明できた", "チームでの成果を自分の貢献と分けて説明できた"],
         prompt_focus: "【他者巻き込み経験へのフィードバック依頼】\n[質問: 他者を巻き込んで何かを成し遂げた経験を話してください]\n\n以下の私の回答に対して、リーダーシップの形(指示型か支援型か)、そしてメンバーを納得させた説得力についてフィードバックをください。",
-        audio_source: "day7_guidance.mp3",
+        audio_sources: {
+            kyarijii: "day7_guidance.mp3",
+            normal: "day7_normal.mp3"
+        }
     },
     8: {
         title: "#8日目# ストレスはどのように解消しますか?",
@@ -586,13 +675,16 @@ const questionsData = {
         },
         checklist: ["解消法が健康的で建設的である", "ストレスを自己認識できていることを示せた", "仕事に支障をきたさないことを示唆できた"],
         prompt_focus: "【ストレス解消法へのフィードバック依頼】\n[質問: ストレスはどのように解消しますか?]\n\n以下の私の回答に対して、解消法が仕事の継続性に影響を与えないか、また、自己管理能力が伝わる内容になっているかについてフィードバックをください。",
-        audio_source: "day8_guidance.mp3",
+        audio_sources: {
+            kyarijii: "day8_guidance.mp3",
+            normal: "day8_normal.mp3"
+        }
     },
     9: {
         title: "#9日目# あなたの強みと弱みを改めて教えてください",
         chara_lead_title: "キャリ爺じゃ！",
         chara_lead_text: "9日目じゃな。今日のテーマは、『強みと弱み』じゃ。自分と向き合うぞ。",
-        chara_think_title: "まずは、この質問の意D$uをかんがえてみよう",
+        chara_think_title: "まずは、この質問の意図をかんがえてみよう",
         chara_think_text: "面接官が『弱み』を聞くのは、君をイジメたいわけじゃないぞ（笑）<br>そうじゃなく、君が自分を『客観視』できているか、そしてその弱みを『改善しようと努力』しているかを知りたいんじゃ。",
         chara_example_intro: "キャリ爺が「回答例」を教えるぞ！",
         ai_chara_title: "よーし、君の回答をまずは、書いてみよう。<br>大丈夫です、「AIお助けマン」がサポートしますよ！",
@@ -608,7 +700,10 @@ const questionsData = {
         },
         checklist: ["強みと弱みに一貫性があるか確認した", "弱みの改善策を具体的に述べた", "弱みが仕事に致命的ではないことを示した"],
         prompt_focus: "【強みと弱みへのフィードバック依頼】\n[質問: あなたの強みと弱みを改めて教えてください]\n\n以下の私の回答に対して、弱みが仕事に致命的でないか、そして弱みの改善策が現実的で具体的な行動を伴っているかについてフィードバックをください。",
-        audio_source: "day9_guidance.mp3",
+        audio_sources: {
+            kyarijii: "day9_guidance.mp3",
+            normal: "day9_normal.mp3"
+        }
     },
     10: {
         title: "#10日目# 入社後のキャリアプランを教えてください",
@@ -628,7 +723,10 @@ const questionsData = {
         },
         checklist: ["具体的な期間で区切って話した", "企業のビジョンと合致しているか確認した", "「貢献」を軸に話した"],
         prompt_focus: "【キャリアプランへのフィードバック依頼】\n[質問: 入社後のキャリアプランを教えてください]\n\n以下の私の回答に対して、プランが現実的か、また、単なる「出世欲」ではなく「貢献意欲」が伝わるかについてフィードバックをください。",
-        audio_source: "day10_guidance.mp3",
+        audio_sources: {
+            kyarijii: "day10_guidance.mp3",
+            normal: "day10_normal.mp3"
+        }
     },
     11: {
         title: "#11日目# 今までで一番達成感を感じたことは何ですか?",
@@ -650,7 +748,10 @@ const questionsData = {
         },
         checklist: ["達成感の根拠となる努力を具体的に語った", "プロセスから得られた教訓を明確にした", "話に熱意が込められていたか確認した"],
         prompt_focus: "【達成感の経験へのフィードバック依頼】\n[質問: 今までで一番達成感を感じたことは何ですか?]\n\n以下の私の回答に対して、感情的な達成感だけでなく、その経験が私の仕事への取り組み方や問題解決能力を証明しているかについてフィードバックをください。",
-        audio_source: "day11_guidance.mp3",
+        audio_sources: {
+            kyarijii: "day11_guidance.mp3",
+            normal: "day11_normal.mp3"
+        }
     },
     12: {
         title: "#12日目# 最近気になるニュースや社会問題はありますか?",
@@ -668,7 +769,10 @@ const questionsData = {
         },
         checklist: ["ニュースの内容を正しく理解しているか確認した", "自分の意見を明確に述べた", "応募企業との関連性を示せた"],
         prompt_focus: "【ニュースへの意見へのフィードバック依頼】\n[質問: 最近気になるニュースや社会問題はありますか?]\n\n以下の私の回答に対して、ニュースの分析の深さ、自分の意見の論理性、そして回答が単なる情報提供で終わっていないか(意見や提言があるか)についてフィードバックをください。",
-        audio_source: "day12_guidance.mp3",
+        audio_sources: {
+            kyarijii: "day12_guidance.mp3",
+            normal: "day12_normal.mp3"
+        }
     },
     13: {
         "title": "#13日目# 逆質問はありますか?",
@@ -699,7 +803,10 @@ const questionsData = {
             "2〜3つの質問を準備した"
         ],
         "prompt_focus": "【逆質問のフィードバック依頼】\n[質問: 逆質問はありますか?]\n\n以下の私が準備した逆質問のリストに対して、質問のレベル感、入社意欲の伝わりやすさ、そして面接官が答えやすい質問になっているかについてフィードバックをください。",
-        "audio_source": "day13_guidance.mp3"
+        audio_sources: {
+            kyarijii: "day13_guidance.mp3",
+            normal: "day13_normal.mp3"
+        }
     },
     14: {
         title: "#14日目# あなたの座右の銘を教えてください",
@@ -726,7 +833,10 @@ const questionsData = {
         },
         checklist: ["座右の銘を選んだ理由を明確にできた", "具体的な行動との結びつきを説明できた", "話に深みが加わったか確認した"],
         prompt_focus: "【座右の銘へのフィードバック依頼】\n[質問: あなたの座右の銘を教えてください]\n\n以下の私の回答に対して、座右の銘が私の行動原理として納得できるか、そして仕事への姿勢としてポジティブに伝わるかについてフィードバックをください。",
-        audio_source: "day14_guidance.mp3",
+        audio_sources: {
+            kyarijii: "day14_guidance.mp3",
+            normal: "day14_normal.mp3"
+        }
     },
     15: {
         title: "#15日目# 面接全体を振り返ろう",
@@ -744,18 +854,18 @@ const questionsData = {
         },
         checklist: ["全質問の回答を3分以内にまとめられた", "自己PRと志望動機に一貫性があるか再確認した", "想定外の質問への対応策を考えた"],
         prompt_focus: "【最終振り返りフィードバック依頼】\n[質問: このプログラムで最も準備が難しいと感じた質問はどれですか?]\n\n私の学習結果全体を想定し、この回答を補強するために、どのような質問が面接官から深掘りされる可能性が高いかについてフィードバックをください。",
-        audio_source: "day15_guidance.mp3",
+        audio_sources: {
+            kyarijii: "day15_guidance.mp3",
+            normal: "day15_normal.mp3"
+        }
     },
 };
-// --- ★ここまで★ ---
+// ★★★ ここまで ★★★
 
 // 重要度別カテゴリの区分け
 const categories = {
-    // 最重要 (Core): 自己紹介, ガクチカ, 志望動機, 他者巻き込み, キャリアプラン, 逆質問
     core: [1, 2, 3, 4, 7, 10, 13],
-    // 重要 (Key): 自己PR, 活かせるスキル, 強み/弱み, 成功/失敗
     key: [5, 9, 6],
-    // 準備しておくと良い (Good): ストレス, 達成感, ニュース, 座右の銘, 振り返り
     good: [8, 11, 12, 14, 15]
 };
 
@@ -763,27 +873,24 @@ let currentDay = 0;
 let currentNavTab = 'daily';
 let currentCategory = 'core';
 
-// DOMの参照
+// DOMの参照 (主要なもの)
 const listDaily = document.getElementById('questions-list-daily');
 const listCategoryContainer = document.getElementById('list-category-container');
 const listDailyContainer = document.getElementById('list-daily-container');
 const categoryFilterNav = document.getElementById('category-filter-nav');
-
 const lists = {
     core: document.getElementById('questions-list-core'),
     key: document.getElementById('questions-list-key'),
     good: document.getElementById('questions-list-good')
 };
-
 const tabDaily = document.getElementById('tab-daily');
 const tabCategory = document.getElementById('tab-category');
 const contentContainer = document.getElementById('content-container');
 const progressBarFill = document.getElementById('progress-bar-fill');
 const progressText = document.getElementById('progress-text');
-
 let mainAudio = document.getElementById('main-audio');
 
-// --- ★ 構文エラーを修正: functions の全データを復元 ★ ---
+// --- ( formatTime 関数 ) ---
 const formatTime = (seconds) => {
     if (isNaN(seconds) || seconds < 0) return '0:00';
     const min = Math.floor(seconds / 60);
@@ -791,6 +898,7 @@ const formatTime = (seconds) => {
     return `${min}:${sec < 10 ? '0' : ''}${sec}`;
 };
 
+// --- ( renderDayContent 関数 ) ---
 const renderDayContent = (day) => {
     if (!mainAudio.paused) mainAudio.pause();
     mainAudio.src = '';
@@ -809,6 +917,15 @@ const renderDayContent = (day) => {
     if (day === 0) {
         contentContainer.innerHTML = `
             <div class="card p-6 text-center">
+                <div class="chara-container">
+                    <div class="chara-icon chara-kyarijii">
+                        <i class="fas fa-smile-beam"></i>
+                    </div>
+                    <div class="balloon">
+                        <h4 class="balloon-title">ようこそ！</h4>
+                        <p class="text-gray-700">まずは、左のメニューから修行したい日を選ぶか、重要度別版でチャレンジするんじゃ！</p>
+                    </div>
+                </div>
                 <h2 class="text-2xl font-bold text-gray-700">${data.title}</h2>
                 <p class="mt-4 text-gray-600">このプログラムは、主要な面接質問に対する体系的な回答準備を15日間で完了させることを目的としています。</p>
                 <p class="mt-2 text-gray-600">左側のメニューから、学習したい日(質問)を選択してください。</p>
@@ -818,19 +935,16 @@ const renderDayContent = (day) => {
         return;
     }
 
-    // --- ★キャラクター用HTMLの生成★ ---
     let charaLeadHtml = '';
     let charaThinkHtml = '';
     let charaExampleTitleHtml = '';
     let aiCharaHtml = '';
 
-    // dataが存在し、キャラクター用のデータがあるか確認
     if (data && data.chara_lead_title) {
-        // キャリ爺の導入吹き出し
         charaLeadHtml = `
             <div class="chara-container">
                 <div class="chara-icon chara-kyarijii">
-                    <i class="fas fa-smile-beam"></i> <!-- ★アイコン変更★ -->
+                    <i class="fas fa-smile-beam"></i>
                 </div>
                 <div class="balloon">
                     <h4 class="balloon-title">${data.chara_lead_title}</h4>
@@ -838,12 +952,10 @@ const renderDayContent = (day) => {
                 </div>
             </div>
         `;
-        
-        // 質問の意図を問うリード文
         charaThinkHtml = `
             <div class="chara-container chara-think">
                 <div class="chara-icon chara-kyarijii">
-                    <i class="fas fa-smile-beam"></i> <!-- ★アイコン変更★ -->
+                    <i class="fas fa-smile-beam"></i>
                 </div>
                 <div class="balloon balloon-think">
                     <h4 class="balloon-title balloon-title-think">
@@ -853,12 +965,10 @@ const renderDayContent = (day) => {
                 </div>
             </div>
         `;
-        
-        // 回答例セクション
         charaExampleTitleHtml = `
             <div class="chara-container chara-example">
                 <div class="chara-icon chara-kyarijii">
-                    <i class="fas fa-smile-beam"></i> <!-- ★アイコン変更★ -->
+                    <i class="fas fa-smile-beam"></i>
                 </div>
                 <div class="balloon balloon-example">
                     <h4 class="balloon-title balloon-title-example">
@@ -867,8 +977,6 @@ const renderDayContent = (day) => {
                 </div>
             </div>
         `;
-
-        // AIお助けマン セクション
         aiCharaHtml = `
             <div class="chara-container chara-ai-container">
                 <div class="chara-icon chara-ai">
@@ -882,15 +990,13 @@ const renderDayContent = (day) => {
             </div>
         `;
     }
-    // --- ★ここまで★ ---
 
-    // --- ★振り返りセクション用のキャリ爺吹き出しHTMLを追加★ ---
     let charaReviewHtml = '';
-    if (day > 0) { // 0日目（はじめに）では表示しない
+    if (day > 0) {
         charaReviewHtml = `
             <div class="chara-container">
                 <div class="chara-icon chara-kyarijii">
-                    <i class="fas fa-clipboard-check"></i> <!-- 振り返り用アイコン -->
+                    <i class="fas fa-clipboard-check"></i>
                 </div>
                 <div class="balloon">
                     <h4 class="balloon-title">今日の修行の進捗じゃ！</h4>
@@ -899,9 +1005,7 @@ const renderDayContent = (day) => {
             </div>
         `;
     }
-    // --- ★ここまで★ ---
-
-
+    
     const isDetailedExampleExist = data.example_detailed && Object.keys(data.example_detailed).length > 0;
     
     let detailedExampleHTML = '';
@@ -921,7 +1025,7 @@ const renderDayContent = (day) => {
                 <select id="detailed-example-select" class="w-full p-2 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
                     ${options}
                 </select>
-                <p id="detailed-example-text" class="mt-3 p-3 bg-white rounded-lg border text-gray-700 whitespace-pre-wrap">${initialDetailedExampleText}</p>
+                <p id="detailed-example-text" class="mt-3 p-3 bg-white rounded-lg border text-gray-700 whitespace-pre-wrap">${initialDetailedExampleText.replace(/\n/g, '<br>')}</p>
             </div>
         `;
     }
@@ -929,7 +1033,6 @@ const renderDayContent = (day) => {
     contentContainer.innerHTML = `
         <div class="card">
             
-            <!-- ★キャリ爺の吹き出しを挿入★ -->
             ${charaLeadHtml}
 
             <h2 class="text-2xl font-bold text-indigo-600">${data.title}</h2>
@@ -954,7 +1057,6 @@ const renderDayContent = (day) => {
                 </div>
             </div>
 
-            <!-- ★質問の意図（リード文）を挿入★ -->
             ${charaThinkHtml}
 
             <div class="mt-6">
@@ -964,18 +1066,16 @@ const renderDayContent = (day) => {
                 </ul>
             </div>
 
-            <!-- ★回答例セクションのタイトルを挿入★ -->
             ${charaExampleTitleHtml}
             <div class="mt-2 p-5 bg-yellow-50 rounded-xl border border-yellow-200">
                 <div class="mt-4">
                     <h4 class="text-lg font-medium text-gray-700">簡潔な回答例</h4>
-                    <p class="mt-2 p-3 bg-white rounded-lg border text-gray-700 whitespace-pre-wrap">${data.example_simple}</p>
+                    <p class="mt-2 p-3 bg-white rounded-lg border text-gray-700 whitespace-pre-wrap">${data.example_simple.replace(/\n/g, '<br>')}</p>
                 </div>
 
                 ${detailedExampleHTML}
             </div>
 
-            <!-- ★AIお助けマンセクションのタイトルを挿入★ -->
             ${aiCharaHtml}
             <div class="mt-2 p-5 bg-indigo-50 rounded-xl border border-indigo-200">
                 <textarea id="user-answer" rows="6" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="あなたの回答を入力してください..."></textarea>
@@ -992,7 +1092,6 @@ const renderDayContent = (day) => {
                 </div>
             </div>
 
-            <!-- ★キャリ爺の振り返り吹き出しを挿入★ -->
             ${charaReviewHtml}
             <div class="mt-2 p-5 bg-blue-50 rounded-xl border border-blue-200">
                 <h3 class="text-xl font-semibold mb-3 text-blue-700">📋 今日の振り返りチェックリスト</h3>
@@ -1013,12 +1112,24 @@ const renderDayContent = (day) => {
         </div>
     `;
 
-    initAudioPlayer(data.audio_source);
+    let audioSourceToPlay = '';
+    if (data.audio_sources) {
+        audioSourceToPlay = data.audio_sources[currentAudioMode];
+    } else if (data.audio_source) { // フォールバック
+        audioSourceToPlay = data.audio_source;
+    }
+
+    initAudioPlayer(audioSourceToPlay);
     initDetailedExample(data.example_detailed);
     initChecklistAndPrompt(data);
 };
 
+// --- ( initAudioPlayer 関数 ) ---
 const initAudioPlayer = (source) => {
+    if (!source) {
+        console.warn("Audio source is missing.");
+        return;
+    }
     mainAudio.src = source;
     mainAudio.load();
     mainAudio.playbackRate = 1.0;
@@ -1089,18 +1200,22 @@ const initAudioPlayer = (source) => {
     });
 };
 
+// --- ( initDetailedExample 関数 ) ---
 const initDetailedExample = (detailedExamples) => {
     const select = document.getElementById('detailed-example-select');
     const exampleText = document.getElementById('detailed-example-text');
     
-    if (select && exampleText) {
-        select.onchange = (e) => {
-            const key = e.target.value;
-            exampleText.textContent = detailedExamples[key];
-        };
+    if (detailedExamples && Object.keys(detailedExamples).length > 0) {
+        if (select && exampleText) {
+            select.onchange = (e) => {
+                const key = e.target.value;
+                exampleText.innerHTML = detailedExamples[key].replace(/\n/g, '<br>');
+            };
+        }
     }
 };
 
+// --- ( initChecklistAndPrompt 関数 ) ---
 const initChecklistAndPrompt = (data) => {
     const checklistItems = document.querySelectorAll('.checklist-item');
     const generatePromptBtn = document.getElementById('generate-prompt');
@@ -1133,7 +1248,16 @@ const initChecklistAndPrompt = (data) => {
 
     generatePromptBtn.onclick = () => {
         if (userAnswerTextarea.value.trim() === '') {
-            alert('まずは君の回答を入力してみておくれ！'); // ★アラートもキャリ爺風に★
+            if (currentAudioMode === 'kyarijii') {
+                // alert('まずは君の回答を入力してみておくれ！');
+                // 代替メッセージング
+                const msg = currentAudioMode === 'kyarijii' ? 'まずは君の回答を入力してみておくれ！' : 'まずはあなたの回答を入力してください。';
+                // 例: 簡素なメッセージボックス表示 (ここではalertの代替としてconsoleを使用)
+                console.warn(msg); 
+            } else {
+                 // alert('まずはあなたの回答を入力してください。');
+                console.warn('まずはあなたの回答を入力してください。'); 
+            }
             return;
         }
         const prompt = `${data.prompt_focus}\n\n[質問内容]\n${data.title}\n\n[私の回答]\n${userAnswerTextarea.value.trim()}`;
@@ -1144,16 +1268,17 @@ const initChecklistAndPrompt = (data) => {
     copyPromptBtn.onclick = () => {
         generatedPromptTextarea.select();
         document.execCommand('copy');
-        alert('プロンプトがクリップボードにコピーされました!');
+        // alert('プロンプトがクリップボードにコピーされました!');
+        // 代替メッセージング
+        const copyMsg = 'プロンプトがクリップボードにコピーされました!';
+        console.log(copyMsg);
     };
     
     updateProgressBar();
 };
-// --- ★ここまで★ ---
 
-// --- ★NEW Function: Update Nav Menu Visuals★ ---
+// --- ( updateNavigationMenuStatus 関数 ) ---
 const updateNavigationMenuStatus = (dayCompletionStatus) => {
-    // Both daily list and category lists need to be updated
     const allListItems = document.querySelectorAll('aside ul li[data-day]');
     
     allListItems.forEach(li => {
@@ -1162,7 +1287,6 @@ const updateNavigationMenuStatus = (dayCompletionStatus) => {
 
         const percentage = dayCompletionStatus.get(day);
         
-        // Find existing icon if any
         let icon = li.querySelector('.completion-icon');
         
         if (percentage === 100) {
@@ -1170,58 +1294,49 @@ const updateNavigationMenuStatus = (dayCompletionStatus) => {
             if (!icon) {
                 icon = document.createElement('i');
                 icon.className = 'fas fa-check-circle completion-icon';
-                li.prepend(icon); // Add icon at the beginning
+                li.prepend(icon);
             }
         } else {
             li.classList.remove('day-complete');
             if (icon) {
-                icon.remove(); // Remove icon if not complete
+                icon.remove();
             }
         }
     });
 };
-// --- ★ここまで★ ---
 
-
-// --- ★updateProgressBar を修正して成長ビジュアルに対応★ ---
+// --- ( updateProgressBar 関数 ) ---
 const updateProgressBar = () => {
     let completedDays = 0;
     let totalItems = 0;
     let completedItems = 0;
     const totalDays = 15;
 
-    // --- ★ This new map will store the completion status for each day ★ ---
     const dayCompletionStatus = new Map();
-    // --- ★ ---
 
     for (let i = 1; i <= totalDays; i++) {
-        // questionsData[i] が存在するかチェック
         if (!questionsData[i]) continue;
 
         const data = questionsData[i];
         const dayChecklistLength = data.checklist ? data.checklist.length : 0;
         let isDayComplete = true;
-        let dayItemsComplete = 0; // --- ★ ---
+        let dayItemsComplete = 0;
 
         for (let j = 0; j < dayChecklistLength; j++) {
             totalItems++;
             if (localStorage.getItem(`checklist_day_${i}_${j}`) === 'true') {
                 completedItems++;
-                dayItemsComplete++; // --- ★ ---
+                dayItemsComplete++;
             } else {
                 isDayComplete = false;
             }
         }
         
-        // --- ★ Store status for this day ★ ---
         if (dayChecklistLength > 0) {
             dayCompletionStatus.set(i, (dayItemsComplete / dayChecklistLength) * 100);
         } else {
-            // Days with no checklist (like day 0, though we start loop at 1)
-            // We'll treat them as "not applicable" and they won't get a checkmark.
             dayCompletionStatus.set(i, 0); 
         }
-        // --- ★ ---
 
         if (isDayComplete && dayChecklistLength > 0) {
             completedDays++;
@@ -1232,40 +1347,56 @@ const updateProgressBar = () => {
     progressBarFill.style.width = `${progress.toFixed(2)}%`;
     progressText.textContent = `${completedDays}/${totalDays} 日完了 (${completedItems}/${totalItems} 項目)`;
 
-    // --- ★成長ビジュアルのロジック★ ---
     const growthIcon = document.getElementById('growth-icon');
     const growthText = document.getElementById('growth-text');
     const progressPercent = document.getElementById('progress-percent');
 
     if (growthIcon && growthText && progressPercent) {
-        progressPercent.textContent = progress.toFixed(0); // パーセンテージ表示
+        progressPercent.textContent = progress.toFixed(0);
 
         if (progress === 0) {
-            growthIcon.textContent = '🌱'; // 種
-            growthText.textContent = '修行が始まったぞ！まずは種まきじゃ！';
+            growthIcon.textContent = '🌱';
         } else if (progress > 0 && progress <= 25) {
-            growthIcon.textContent = '🌱'; // 双葉
-            growthText.textContent = 'おっ！芽が出たようじゃな！良い調子じゃ！';
+            growthIcon.textContent = '🌱';
         } else if (progress > 25 && progress <= 50) {
-            growthIcon.textContent = '🌳'; // 小さな木
-            growthText.textContent = '順調に育っておる！幹が太くなってきたぞ！';
+            growthIcon.textContent = '🌳';
         } else if (progress > 50 && progress <= 99) {
-            growthIcon.textContent = '🌸'; // 花
-            growthText.textContent = 'おおー！見事な花が咲いたぞ！あともう一息じゃ！';
+            growthIcon.textContent = '🌸';
         } else if (progress >= 100) {
-            growthIcon.textContent = '🍎'; // 実
-            growthText.textContent = '【皆伝】おめでとう！見事な実がなったぞ！完璧じゃ！';
+            growthIcon.textContent = '🍎';
+        }
+        
+        if (currentAudioMode === 'kyarijii') {
+            if (progress === 0) {
+                growthText.textContent = '修行が始まったぞ！まずは種まきじゃ！';
+            } else if (progress > 0 && progress <= 25) {
+                growthText.textContent = 'おっ！芽が出たようじゃな！良い調子じゃ！';
+            } else if (progress > 25 && progress <= 50) {
+                growthText.textContent = '順調に育っておる！幹が太くなってきたぞ！';
+            } else if (progress > 50 && progress <= 99) {
+                growthText.textContent = 'おおー！見事な花が咲いたぞ！あともう一息じゃ！';
+            } else if (progress >= 100) {
+                growthText.textContent = '【皆伝】おめでとう！見事な実がなったぞ！完璧じゃ！';
+            }
+        } else {
+            if (progress === 0) {
+                growthText.textContent = '学習が開始されました。';
+            } else if (progress > 0 && progress <= 25) {
+                growthText.textContent = '学習が進んでいます。良い調子です。';
+            } else if (progress > 25 && progress <= 50) {
+                growthText.textContent = '順調です。プログラムの半分に到達しました。';
+            } else if (progress > 50 && progress <= 99) {
+                growthText.textContent = '素晴らしいです！あと少しで完了です。';
+            } else if (progress >= 100) {
+                growthText.textContent = '【完了】おめでとうございます！全ての項目を達成しました。';
+            }
         }
     }
-    // --- ★ここまで★ ---
 
-    // --- ★ NEW: Call the function to update the nav menu visuals ★ ---
     updateNavigationMenuStatus(dayCompletionStatus);
-    // --- ★ ---
 };
-// --- ★ここまで★ ---
 
-// --- ★ 構文エラーを修正: functions の全データを復元 ★ ---
+// --- ( switchNavTab 関数 ) ---
 const switchNavTab = (tabName) => {
     currentNavTab = tabName;
 
@@ -1283,15 +1414,22 @@ const switchNavTab = (tabName) => {
         categoryFilterNav.classList.remove('hidden');
     }
     
-    if (currentDay === 0 && tabName === 'category') {
-        renderDayContent(categories.core[0]); 
-    } else if (currentDay === 0 && tabName === 'daily') {
-        renderDayContent(0);
+    // Day 0 を選択中にタブを切り替えた場合の処理
+    if (currentDay === 0) {
+        if (tabName === 'category') {
+            // 重要度別版に切り替えたら、Coreの最初の質問（Day 1）を表示
+            renderDayContent(categories.core[0]);
+        } else {
+            // 日数別版に戻したら、Day 0（はじめに）を再表示
+            renderDayContent(0);
+        }
     } else {
+        // Day 1以降を選択中にタブを切り替えたら、同じDayを再表示
         renderDayContent(currentDay);
     }
 };
 
+// --- ( イベントリスナー ) ---
 document.querySelectorAll('#category-filter-nav .category-button').forEach(btn => {
     btn.addEventListener('click', () => {
         currentCategory = btn.dataset.category;
@@ -1320,48 +1458,140 @@ tabCategory.addEventListener('click', () => switchNavTab('category'));
     });
 });
 
-document.addEventListener('DOMContentLoaded', () => {
-    renderQuestionsList();
-    switchNavTab('daily');
-    renderDayContent(0); // 最初は「はじめに」を表示
-    updateProgressBar(); // ページ読み込み時にも進捗を更新
-    initIntroAudioPlayer();
+// --- ( リセット機能の追加 ) ---
+const resetData = () => {
+    // ユーザーに確認を求める（alertは使用できないため、console.logで代替）
+    console.log("★★★★ 進捗データを完全にリセットしますか？ ★★★★");
+    console.log("この操作は元に戻せません。");
+    // 実際のアプリケーションではカスタムモーダルを使用すべき。ここでは簡略化のため直接localStorageを操作。
     
-    // PWA: Service Workerの登録
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js')
-                .then(registration => console.log('Service Worker registered'))
-                .catch(err => console.log('Service Worker registration failed', err));
-        });
+    // localStorage内の進捗関連データをすべて削除
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        // 回答、チェックリスト、評価メモに関連するキーをターゲットに絞る
+        if (key.startsWith('answer_day_') || key.startsWith('checklist_day_') || key.startsWith('eval_day_')) {
+            localStorage.removeItem(key);
+            // iをデクリメントしてループのキーインデックスずれを防ぐ
+            i--; 
+        }
+    }
+
+    // 成功メッセージを表示（コンソール）
+    console.log("進捗データがリセットされました。ページをリロードします。");
+
+    // ページをリロードして初期状態に戻す
+    window.location.reload();
+};
+
+
+// --- ( DOMContentLoaded イベント ) ---
+document.addEventListener('DOMContentLoaded', () => {
+    
+    const modal = document.getElementById('mode-select-modal');
+    const selectKyarijii = document.getElementById('select-kyarijii');
+    const selectNormal = document.getElementById('select-normal');
+    const introAudio = document.getElementById('intro-audio');
+    const mainTitle = document.querySelector('header h1');
+    const mainSubtitle = document.querySelector('header p');
+    const audioWarning = document.getElementById('audio-warning');
+    
+    // ★★★【追加】実践練習モードのDOM要素をここで取得 ★★★
+    startPracticeBtn = document.getElementById('start-practice-mode');
+    practiceModal = document.getElementById('practice-modal');
+    practiceQuestionCount = document.getElementById('practice-question-count');
+    practiceQuestionTitle = document.getElementById('practice-question-title');
+    practiceTimer = document.getElementById('practice-timer');
+    practiceTimerBar = document.getElementById('practice-timer-bar');
+    stopPracticeBtn = document.getElementById('stop-practice');
+    nextPracticeBtn = document.getElementById('next-practice-question');
+    // ★★★ ここまで ★★★
+
+    // リセットボタンのイベントリスナーを追加
+    const resetButton = document.getElementById('reset-data-button');
+    if (resetButton) {
+        resetButton.addEventListener('click', resetData);
     }
     
-    // PWA: インストールプロンプトの表示
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
+
+    const initializeApp = (mode) => {
+        currentAudioMode = mode;
         
-        const installBtn = document.createElement('button');
-        installBtn.textContent = 'アプリをインストール';
-        installBtn.className = 'fixed bottom-4 right-4 bg-indigo-600 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-indigo-700 transition z-50';
-        installBtn.onclick = async () => {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                deferredPrompt = null;
-                installBtn.remove();
-            }
-        };
-        document.body.appendChild(installBtn);
-    });
+        const introSrc = questionsData[0].audio_sources[mode];
+        if (introSrc) {
+            introAudio.src = introSrc;
+            introAudio.load();
+        } else {
+            console.warn("Intro audio source is missing for mode:", mode);
+        }
+
+        const practiceDescription = document.getElementById('practice-description'); // ★追加
+
+        if (mode === 'kyarijii') {
+            mainTitle.textContent = 'キャリ爺の面接道場';
+            mainSubtitle.textContent = '15日間の修行で、最強の面接スキルを手に入れるんじゃ！';
+            audioWarning.textContent = '★注意★各日程の音声ガイドを再生する場合は、この説明音声をstopするんじゃぞ。★';
+            audioWarning.classList.remove('hidden');
+            practiceDescription.textContent = '準備ができたら、ランダムな質問（全3問）で本番の練習をするんじゃ！'; // ★追加
+        } else {
+            mainTitle.textContent = '面接対策 15日間プログラム';
+            mainSubtitle.textContent = '15日間の学習で、面接スキルを習得しましょう。';
+            audioWarning.textContent = '★注意★各日程の音声ガイドを再生する場合は、この説明音声をstopしてください。★';
+            audioWarning.classList.remove('hidden');
+            practiceDescription.textContent = '準備ができたら、ランダムな質問（全3問）で本番の練習をしてください。'; // ★追加
+            document.body.classList.add('normal-mode');
+        }
+
+        modal.style.display = 'none';
+
+        renderQuestionsList();
+        switchNavTab('daily'); // これが renderDayContent(0) を呼び出す
+        updateProgressBar();
+        initIntroAudioPlayer();
+        
+        // ★★★【追加】実践練習モードのイベントリスナーを登録 ★★★
+        startPracticeBtn.addEventListener('click', startPracticeMode);
+        stopPracticeBtn.addEventListener('click', stopPracticeMode);
+        nextPracticeBtn.addEventListener('click', handleNextPracticeClick);
+        // ★★★ ここまで ★★★
+        
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(registration => console.log('Service Worker registered'))
+                    .catch(err => console.log('Service Worker registration failed', err));
+            });
+        }
+        
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            const installBtn = document.createElement('button');
+            installBtn.textContent = 'アプリをインストール';
+            installBtn.className = 'fixed bottom-4 right-4 bg-indigo-600 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-indigo-700 transition z-50';
+            installBtn.onclick = async () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    deferredPrompt = null;
+                    installBtn.remove();
+                }
+            };
+            document.body.appendChild(installBtn);
+        });
+    };
+
+    selectKyarijii.addEventListener('click', () => initializeApp('kyarijii'));
+    selectNormal.addEventListener('click', () => initializeApp('normal'));
 });
 
+// --- ( renderQuestionsList 関数 ) ---
 const renderQuestionsList = () => {
     listDaily.innerHTML = '';
-    // Day 0 を除外して 1 から 15 までリストアップ
+    // Day 0 を除外
     for (let i = 1; i <= 15; i++) {
-        if (!questionsData[i]) continue; // データが存在しない場合はスキップ
+        if (!questionsData[i]) continue;
         const listItem = document.createElement('li');
         listItem.textContent = questionsData[i].title;
         listItem.dataset.day = i;
@@ -1371,7 +1601,7 @@ const renderQuestionsList = () => {
     for (const category in lists) {
         lists[category].innerHTML = '';
         categories[category].forEach(day => {
-            if (!questionsData[day]) return; // データが存在しない場合はスキップ
+            if (!questionsData[day]) return;
             const listItem = document.createElement('li');
             listItem.textContent = questionsData[day].title;
             listItem.dataset.day = day;
@@ -1380,6 +1610,7 @@ const renderQuestionsList = () => {
     }
 };
 
+// --- ( initIntroAudioPlayer 関数 ) ---
 const initIntroAudioPlayer = () => {
     const playIntroBtn = document.getElementById('play-intro');
     const introAudio = document.getElementById('intro-audio');
@@ -1415,7 +1646,236 @@ const initIntroAudioPlayer = () => {
         });
     }
 };
-// --- ★ここまで★ ---
+
+// ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+// ★★★【以下に、実践練習モード用の関数を丸ごと追加】★★★
+// ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+
+/**
+ * Web Audio APIを使用して短いビープ音を鳴らす
+ */
+const playBeep = () => {
+    // AudioContextが中断されている場合は再開を試みる (ユーザー操作後にのみ可能)
+    if (audioContext.state === 'suspended') {
+        audioContext.resume().catch(e => console.error("AudioContext resume failed:", e));
+    }
+
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+
+    // 周波数と波形を設定 (短い電子音に最適な設定)
+    oscillator.type = 'sine'; // サイン波 (正弦波) を使用
+    oscillator.frequency.setValueAtTime(440, audioContext.currentTime); // 440Hz (A4)
+
+    // ゲインを設定 (音量調整)
+    gainNode.gain.setValueAtTime(0.5, audioContext.currentTime); // 初期音量を0.5に設定
+    // フェードアウト
+    gainNode.gain.exponentialRampToValueAtTime(0.00001, audioContext.currentTime + 0.3); // 0.3秒かけてフェードアウト
+
+    // 接続: オシレーター -> ゲイン -> 出力
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+
+    // 再生開始と停止
+    oscillator.start();
+    oscillator.stop(audioContext.currentTime + 0.3); // 0.3秒後に停止
+};
+
+/**
+ * 配列をシャッフルする（Fisher-Yatesアルゴリズム）
+ */
+const shuffleArray = (array) => {
+    let newArr = [...array]; // 元の配列を変更しない
+    for (let i = newArr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
+    }
+    return newArr;
+};
+
+/**
+ * 練習モードを開始する
+ */
+const startPracticeMode = () => {
+    // 動作中の音声をすべて停止
+    const introAudio = document.getElementById('intro-audio');
+    const mainAudio = document.getElementById('main-audio');
+    introAudio.pause();
+    mainAudio.pause();
+    document.getElementById('play-intro').innerHTML = '<i class="fas fa-play"></i>';
+    // Day 0 以外が選択されていたら、その再生ボタンもリセット
+    const mainPlayPauseBtn = document.getElementById('main-play-pause');
+    if (mainPlayPauseBtn) {
+        mainPlayPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+    }
+
+    // 質問を3問ランダムに選ぶ
+    practiceQuestions = shuffleArray(practiceQuestionPool).slice(0, 3);
+    currentPracticeIndex = 0;
+    
+    // 最初の質問を表示
+    showPracticeQuestion();
+    
+    // モーダルを表示
+    practiceModal.classList.remove('hidden');
+    
+    // AudioContextを起動（最初のユーザー操作をトリガーとする）
+    if (audioContext.state === 'suspended') {
+        audioContext.resume().catch(e => console.error("AudioContext resume failed:", e));
+    }
+};
+
+/**
+ * 練習モードを中断・終了する
+ */
+const stopPracticeMode = () => {
+    // タイマーを停止
+    clearInterval(practiceTimerInterval);
+    practiceTimerInterval = null;
+    
+    // モーダルを非表示
+    practiceModal.classList.add('hidden');
+    
+    // 変数をリセット
+    practiceQuestions = [];
+    currentPracticeIndex = 0;
+};
+
+/**
+ * モーダルに現在の質問を表示する
+ */
+const showPracticeQuestion = () => {
+    // タイマーが動いていれば止める
+    clearInterval(practiceTimerInterval);
+    practiceTimerInterval = null;
+
+    // 質問データを取得
+    const day = practiceQuestions[currentPracticeIndex];
+    const data = questionsData[day];
+    
+    // テキストを更新
+    practiceQuestionCount.textContent = `第 ${currentPracticeIndex + 1} 問 / ${practiceQuestions.length} 問`;
+    practiceQuestionTitle.textContent = data.title;
+    
+    // タイマーUIをリセット
+    practiceTimerSeconds = 60;
+    practiceTimer.textContent = formatTime(practiceTimerSeconds); // formatTimeは既存の関数を使用
+    practiceTimer.classList.remove('text-red-500');
+    practiceTimerBar.style.width = '100%';
+    practiceTimerBar.classList.remove('bg-red-500');
+    practiceTimerBar.classList.add('bg-blue-500');
+    
+    // ボタンのテキストをリセット
+    nextPracticeBtn.textContent = 'タイマースタート';
+    nextPracticeBtn.disabled = false; // ボタンを有効化
+};
+
+/**
+ * 「タイマースタート / 次の質問へ」ボタンが押された時の処理
+ */
+const handleNextPracticeClick = () => {
+    const btnState = nextPracticeBtn.textContent;
+    
+    if (btnState === 'タイマースタート') {
+        // タイマーを開始する
+        startPracticeTimer();
+        
+        // ボタンのテキストを変更
+        if (currentPracticeIndex < practiceQuestions.length - 1) {
+            nextPracticeBtn.textContent = '次の質問へ';
+        } else {
+            nextPracticeBtn.textContent = '練習を終了する';
+        }
+        
+    } else if (btnState === '次の質問へ') {
+        // 次の質問へ進む
+        currentPracticeIndex++;
+        showPracticeQuestion();
+        
+    } else if (btnState === '練習を終了する') {
+        // 練習を終了する
+        stopPracticeMode();
+    }
+};
+
+/**
+ * 60秒タイマーを開始する
+ */
+const startPracticeTimer = () => {
+    // 念のため既存のタイマーをクリア
+    clearInterval(practiceTimerInterval);
+    
+    practiceTimerSeconds = 60; // 60秒にリセット
+    
+    practiceTimerInterval = setInterval(() => {
+        practiceTimerSeconds--;
+        
+        // タイマーテキストを更新
+        practiceTimer.textContent = formatTime(practiceTimerSeconds);
+        
+        // タイマーバーを更新
+        practiceTimerBar.style.width = (practiceTimerSeconds / 60) * 100 + '%';
+        
+        // 10秒以下になったら赤くする
+        if (practiceTimerSeconds <= 10) {
+            practiceTimer.classList.add('text-red-500');
+            practiceTimerBar.classList.remove('bg-blue-500');
+            practiceTimerBar.classList.add('bg-red-500');
+        }
+        
+        // 0秒になったら停止
+        if (practiceTimerSeconds <= 0) {
+            clearInterval(practiceTimerInterval);
+            practiceTimerInterval = null;
+            
+            // アラート音を再生（Web Audio APIによるビープ音に変更）
+            playBeep();
+            
+            // タイムアップを通知（キャリ爺モードか通常モードかで文言変更）
+            if (currentAudioMode === 'kyarijii') {
+                // alert('時間じゃ！ 次の質問へ進むんじゃぞ！'); // alertは使わない
+                nextPracticeBtn.disabled = false; // ボタンを再度有効化
+            } else {
+                // alert('時間です。次の質問へ進んでください。'); // alertは使わない
+                nextPracticeBtn.disabled = false; // ボタンを再度有効化
+            }
+            
+            // タイムアップを伝えるメッセージを代わりに表示することも検討するが、今回はシンプルにボタンを有効化するだけに留める。
+        }
+        
+    }, 1000); // 1秒ごとに実行
+};
+// ★★★【実践練習モード用の関数はここまで】 ★★★
+
 </script>
+
+<div id="practice-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex justify-center items-center z-50 hidden">
+    <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-2xl max-w-2xl w-full mx-4 text-center">
+        
+        <div id="practice-content">
+            <h3 class="text-lg font-semibold text-gray-500" id="practice-question-count">第 1 問 / 3 問</h3>
+            <h2 class="text-2xl sm:text-3xl font-bold text-indigo-700 my-6" id="practice-question-title">（質問タイトル）</h2>
+        </div>
+        
+        <div class="my-6 sm:my-8">
+            <p class="text-gray-600 mb-2">回答時間（目安: 60秒）</p>
+            <div class="text-5xl sm:text-6xl font-bold text-gray-800" id="practice-timer">
+                01:00
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2.5 mt-4">
+                <div id="practice-timer-bar" class="bg-blue-500 h-2.5 rounded-full transition-all duration-1000" style="width: 100%"></div>
+            </div>
+        </div>
+        
+        <div class="flex justify-between items-center mt-8 sm:mt-10">
+            <button id="stop-practice" class="text-gray-500 hover:text-gray-700 font-medium px-2 py-2">
+                練習を中断する
+            </button>
+            <button id="next-practice-question" class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-3 px-6 sm:px-8 rounded-lg transition shadow-md text-lg">
+                タイマースタート
+            </button>
+        </div>
+    </div>
+</div>
 </body>
 </html>
