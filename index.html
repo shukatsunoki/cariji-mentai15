@@ -380,6 +380,8 @@
     <audio id="intro-audio"></audio>
     <audio id="main-audio"></audio>
     
+    <!-- 修正: 外部ファイル依存のアラート音を削除 -->
+    <!-- <audio id="timer-alert-audio" src="timer_alert.mp3" preload="auto"></audio> -->
     <div class="container">
         
         <aside>
@@ -442,8 +444,9 @@
                         
                         <div id="intro-speed-controls" class="flex gap-1 text-sm bg-gray-100 p-1 rounded-full">
                             <button data-speed="0.8" class="speed-btn py-1 px-3 rounded-full text-gray-600 hover:bg-white transition duration-150">0.8x</button>
-                            <button data-speed="1.0" class="speed-btn py-1 px-3 rounded-full bg-white text-indigo-600 font-bold shadow-sm transition duration-150">1.0x</button>
-                            <button data-speed="1.2" class="speed-btn py-1 px-3 rounded-full text-gray-600 hover:bg-white transition duration-150">1.2x</button>
+                            <button data-speed="1.0" class="speed-btn py-1 px-3 rounded-full text-gray-600 hover:bg-white transition duration-150">1.0x</button>
+                            <!-- 初期速度が1.2xになるように、CSSクラスを調整 -->
+                            <button data-speed="1.2" class="speed-btn py-1 px-3 rounded-full bg-white text-indigo-600 font-bold shadow-sm transition duration-150">1.2x</button>
                             <button data-speed="1.5" class="speed-btn py-1 px-3 rounded-full text-gray-600 hover:bg-white transition duration-150">1.5x</button>
                         </div>
                     </div>
@@ -477,12 +480,14 @@
                     </div>
                 </div>
 
+                <!-- ★★★ 追加: 進捗リセットボタン ★★★ -->
                 <div class="mt-6 pt-4 border-t border-gray-200 text-center">
                     <button id="reset-data-button" class="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-lg transition duration-150 shadow-sm text-sm">
                         <i class="fas fa-trash-alt mr-2"></i> 進捗データをリセット
                     </button>
                 </div>
-                </div>
+                <!-- ★★★ ここまで ★★★ -->
+            </div>
 
             <div id="content-container">
             </div>
@@ -511,6 +516,8 @@ let practiceTimer, practiceTimerBar, stopPracticeBtn, nextPracticeBtn;
 // 修正: timerAlertAudio を削除
 
 // --- ( formatTime 関数 ) ---
+// formatTime関数が重複して定義されている問題を修正するため、
+// ここで定義を統一します。
 const formatTime = (seconds) => {
     if (isNaN(seconds) || seconds < 0) return '0:00';
     const min = Math.floor(seconds / 60);
@@ -543,7 +550,7 @@ const questionsData = {
         example_simple: "〇〇大学から参りました△△です。学生時代はサークル活動で課題解決に取り組み、チームを牽引しました。本日はよろしくお願いいたします。",
         sample: [
             `**【サンプル1：自己紹介パターン】**\nキャリ爺: 堅実な第一印象を与える、最も標準的な回答じゃ！\n\n〇〇大学の△△です。学生時代は特に、サークル活動を通じて培った「目標達成に向けた粘り強さ」が強みです。貴社が掲げる「顧客第一」の理念に共感し、この強みをもって貢献したいと考えています。本日は短い時間ですが、よろしくお願いいたします。`,
-            `**【サンプル2：職種特化パターン】**\nキャリ爺: 専門性が問われる職種なら、自分の強みを具体的にアピールするんじゃ！\n\n〇〇大学から参りました△△です。大学ではデータサイエンスを専攻し、特にPythonを用いた分析スキルに自信があります。貴社のマーケティング部門でのデータドリブンな意思決定に貢献できると考え、志望いたしました。どうぞよろしくお願いいたします。`
+            `**【サンプル2：職種特化パターン】\nキャリ爺: 専門性が問われる職種なら、自分の強みを具体的にアピールするんじゃ！\n\n〇〇大学から参りました△△です。大学ではデータサイエンスを専攻し、特にPythonを用いた分析スキルに自信があります。貴社のマーケティング部門でのデータドリブンな意思決定に貢献できると考え、志望いたしました。どうぞよろしくお願いいたします。`
         ],
         checklist: ["時間内に収まるか確認した", "結論から述べられているか確認した", "入社意欲が伝わるか確認した"],
         prompt_focus: "【自己紹介へのフィードバック依頼】\n[質問: 自己紹介をお願いします]\n\n以下の私の回答に対して、面接官がさらに深掘りしたくなるような「キーワード」が含まれているか、また、回答が簡潔で分かりやすいかについてフィードバックをください。",
@@ -569,7 +576,7 @@ const questionsData = {
             `**【サンプル2：アルバイトパターン】**\nキャリ爺: 単なる労働じゃなく、どうオペレーションを「改善」したか、主体性を見せるんじゃ！\n\n地域密着型カフェでのアルバイト経験です。**[状況]** 土日のピークタイムには、オーダーミスやレジの混雑による客様の待ち時間が常態化していました。**[課題]** 顧客満足度向上を目指し、特に会計時のボトルネック解消に注力しました。**[行動]** 私は従業員の動線を分析し、既存のレジを活かしつつも、「オーダー専用タブレットの導入」と、「会計後回しシステム(提供後にテーブルで会計)」を提案・導入しました。さらに全従業員へのOJT研修マニュアルを作成しました。**[結果]** ピークタイムの待ち時間を平均**5分から2.5分に短縮**し、お客様アンケートでの満足度評価が**15ポイント上昇**しました。`,
             `**【サンプル3：学業・研究パターン】**\nキャリ爺: 難解な課題にどう挑んだか？粘り強さと、外部知見を活用する賢さをアピールするんじゃ！\n\n所属研究室での卒業研究です。**[状況]** 「次世代リチウムイオン電池の電極材料の劣化メカニズム解析」という難解なテーマに取り組みました。**[課題]** 当初、前例のない新規解析手法を確立する必要があり、既存の先行研究だけでは打開策が見つからず研究が停滞しました。**[行動]** 指導教員だけでなく、分野の異なる**他大学の権威ある教授**にメールで意見を求め、**外部セミナーへ積極的に参加**して知見を広げました。また、データの再現性にこだわり、粘り強くシミュレーションと実験を**100回以上**繰り返しました。**[結果]** 結果的に、従来の**5分の1の時間で劣化度を測定できる新しい分析手法を確立**し、学会でポスター発表を行うことができました。`,
             `**【サンプル4：ボランティアパターン】**\nキャリ爺: 社会貢献活動なら、どう「仕組み」を変えて人を動かしたか、リーダーシップを見せるんじゃ！\n\n地域NPO法人での子供向け学習支援ボランティアのリーダー経験です。**[状況]** 担当した学習プログラムで、参加している中学生の宿題完了率が非常に低く(平均30%)、学習意欲の低下が見られました。**[課題]** 楽しく継続できる学習環境を作り、宿題完了率を改善することを目指しました。**[行動]** 私は一方的な指導ではなく、中学生自身が「教える側」になる**ピア・サポート制度を提案**し、導入しました。また、進捗を可視化する独自のスタンプラリー制度を考案しました。**[結果]** 制度導入後、中学生のプログラムへの**欠席率が半減**し、3ヶ月で宿題完了率を**85%まで向上**させることができました。`,
-            `**【サンプル5：長期インターンパターン】**\nキャリ爺: ビジネス経験なら、具体的な数値と、どう経営層の視点で課題を捉えたかを見せるんじゃ！\n\nITスタートアップ企業でのマーケティング長期インターン経験です。**[状況]** 企業が提供するSaaSプロダクトの新規リード獲得数が伸び悩み、特にWebサイト経由の獲得率が業界平均を下回っていました。**[課題]** WebサイトのCVR(顧客転換率)を改善し、リード獲得数を増やすことにコミットしました。**[行動]** Google Analyticsなどのデータに基づき、ユーザーの離脱ポイントを特定し、ターゲットペルソナに合わせた**LP(ランディングページ)のコピーライティングとUI/UXの改善を提案**しました。また、A/Bテストを週次で実施し、効果測定を行いました。**[結果]** 6ヶ月間のインターン期間で、Webサイト経由のCVRを**約2.5倍に改善**し、月間の新規リード獲得数に貢献しました。`,
+            `**【サンプル5：長期インターンパターン】**\nキャリ爺: ビジネス経験なら、具体的な数値と、どう経営層の視点で課題を捉えたかを見せるんじゃ！\n\nITスタートアップ企業でのマーケティング長期インターン経験です。**[状況]** 企業が提供するSaaSプロダクトの新規リード獲得数が伸び悩み、特にWebサイト経由の獲得率が業界平均平均を下回っていました。**[課題]** WebサイトのCVR(顧客転換率)を改善し、リード獲得数を増やすことにコミットしました。**[行動]** Google Analyticsなどのデータに基づき、ユーザーの離脱ポイントを特定し、ターゲットペルソナに合わせた**LP(ランディングページ)のコピーライティングとUI/UXの改善を提案**しました。また、A/Bテストを週次で実施し、効果測定を行いました。**[結果]** 6ヶ月間のインターン期間で、Webサイト経由のCVRを**約2.5倍に改善**し、月間の新規リード獲得数に貢献しました。`,
         ],
         checklist: ["時間内に収まるか確認した", "結論から述べられているか確認した", "入社意欲が伝わるか確認した"],
         prompt_focus: "【自己紹介へのフィードバック依頼】\n[質問: 自己紹介をお願いします]\n\n以下の私の回答に対して、面接官がさらに深掘りしたくなるような「キーワード」が含まれているか、また、回答が簡潔で分かりやすいかについてフィードバックをください。",
@@ -581,7 +588,7 @@ const questionsData = {
     3: {
         title: "#3日目# あなたの自己PRを教えてください",
         chara_lead_title: "キャリ爺じゃ！",
-        chara_lead_text: "3日目じゃな、順調じゃ！今日のテーマは『自己PR』じゃ！",
+        chara_lead_text: "3日目じゃな。順調じゃ！今日のテーマは『自己PR』じゃ！",
         chara_think_title: "まずは、この質問の意図をかんがえてみよう",
         chara_think_text: "『ガクチカ』とどう違うんじゃ？ と思うかもしれんな。<br>...そうじゃ、『自己PR』は君の『強み』そのものに焦点を当てるんじゃ。面接官は君が『入社後にどう活躍してくれるか』を、具体的なエピソードで判断したいんじゃな。",
         meister_think_text: "この質問は、Day 2の「ガクチカ」と異なり、あなたの『強み』そのものに焦点を当てます。面接官は、あなたがその強みを活かして『入社後にどう貢献し、活躍してくれるか』を、具体的なエピソードで判断したいと考えています。",
@@ -646,8 +653,8 @@ const questionsData = {
         example_simple: "接客のアルバイトで培った顧客とのコミュニケーション能力と、ゼミで学んでいるデータ分析のスキルを活かせると考えています。",
         sample: [
             `**【サンプル1：専門スキル(ITなど)パターン】**\nキャリ爺: 専門性が高いスキルは、具体的な貢献イメージと一緒に語るんじゃ！\n\n前職のシステム開発において、特にデータベース設計の経験が豊富です。貴社の新プロジェクトにおける△△の業務において、この設計スキルを活かし、初期段階から貢献できると確信しています。`,
-            `**【サンプル2：対人スキル(営業・接客)パターン】**\nキャリ爺: 対人スキルは「成果」と一緒に示すんじゃ！ヒアリング力がどう売上に繋がったかを見せるんじゃ！\n\nお客様の潜在的なニーズを引き出すヒアリング力です。前職の営業職では、このヒアリング力を活かし、お客様一人ひとりに最適な提案を行うことで、平均売上の15%向上を達成しました。`,
-            `**【サンプル3：汎用スキル(PC・言語)パターン】**\nキャリ爺: 汎用スキルでも、どう「効率化」に貢献できるか、具体的に語るんじゃ！\n\n高いレベルのPCスキルと、英語でのコミュニケーション能力です。特にExcelやPowerPointを駆使した資料作成や分析作業は、効率よく行える自信があり、海外支社とのやり取りにも貢献できます。`,
+            `**【サンプル2：対人スキル(営業・接客)パターン】\nキャリ爺: 対人スキルは「成果」と一緒に示すんじゃ！ヒアリング力がどう売上に繋がったかを見せるんじゃ！\n\nお客様の潜在的なニーズを引き出すヒアリング力です。前職の営業職では、このヒアリング力を活かし、お客様一人ひとりに最適な提案を行うことで、平均売上の15%向上を達成しました。`,
+            `**【サンプル3：汎用スキル(PC・言語)パターン】\nキャリ爺: 汎用スキルでも、どう「効率化」に貢献できるか、具体的に語るんじゃ！\n\n高いレベルのPCスキルと、英語でのコミュニケーション能力です。特にExcelやPowerPointを駆使した資料作成や分析作業は、効率よく行える自信があり、海外支社とのやり取りにも貢献できます。`,
         ],
         checklist: ["応募職種に必要なスキルを挙げた", "スキルを裏付ける具体的なエピソードがある", "入社後の貢献イメージが具体的である"],
         prompt_focus: "【活かせるスキルへのフィードバック依頼】\n[質問: 入社後に活かせるスキルや経験は何ですか?]\n\n以下の私の回答に対して、応募職種の必須要件とのマッチ度、スキルを裏付けるエピソードの具体性、そして過度に自己評価が高くないかについてフィードバックをください。",
@@ -740,7 +747,6 @@ const questionsData = {
         ai_chara_title: "よーし、君の回答をまずは、書いてみよう。<br>大丈夫です、「AIお助けマン」がサポートしますよ！",
         description: "自己分析の深さと客観性を測る。弱みは仕事に致命的でないものを選び、改善努力をセットで話す。",
         points: ["強みと弱みのバランスを取る(表裏一体である必要はない)。", "弱みは必ず「改善への取り組み」とセットで話す。", "応募職種にとって致命的となる弱み(例:エンジニアなのに論理的思考が苦手)は避ける。"],
-        example_simple: "強みは行動力、弱みは慎重さに欠ける点です。弱みは意識してチェックリストを使うことで改善しています。",
         sample: [
             `**【サンプル1：論理的思考力とスピード不足パターン】**\nキャリ爺: 弱みは「結論を出すまでのスピード」じゃ！どうやって改善したか、具体的な行動を見せるんじゃ！\n\n私の強みは、複雑な状況を整理し、構造的に理解できる**論理的思考力**です。一方で弱みは、その思考を突き詰めるあまり、物事の**結論を出すまでに時間をかけすぎてしまう点**です。現在は、タスクに着手する際に**「まず60%の完成度でアウトプットする」という期限**を設け、上司やチームに早期に共有することで、スピードを意識的に改善しています。`,
             `**【サンプル2：共感力と断れないパターン】**\nキャリ爺: 人の良さが弱みになることもある！どうやって「論理的に断れる仕組み」を作ったかを語るんじゃ！\n\n私の強みは、チームメンバーの気持ちを汲み取り、円滑な人間関係を築く**共感力**と**傾聴力**です。しかし、これが裏目に出て、**他者からの依頼を断りきれず、自分の業務を圧迫してしまう点**が弱みです。改善策として、依頼を受けた際に**自分のタスク管理表を即座に確認**する習慣をつけ、「依頼の目的」と「自分のリソース」を比較検討し、優先度の低い依頼は代替案を提示して断るよう徹底しています。`,
@@ -765,7 +771,6 @@ const questionsData = {
         ai_chara_title: "よーし、君の回答をまずは、書いてみよう。<br>大丈夫です、「AIお助けマン」がサポートしますよ！",
         description: "入社意欲の高さと、企業の事業への理解度を測る。企業のビジョンと自分の成長が一致していることを示す。",
         points: ["短期(1〜3年)、中期(5年)、長期(10年)といった具体的な期間で区切って話す。", "企業の具体的な部署名やプロジェクト名を挙げ、具体的な役割をイメージさせる。", "単なる昇進ではなく、「どう成長して会社にどう貢献するか」に焦点を当てる。"],
-        example_simple: "まずは現場で経験を積み、5年後にはチームをリードできる人材になりたいです。10年後には会社の中心となって事業を推進したいです。",
         sample: [
             `**【サンプル1：専門性の追求パターン】**\nキャリ爺: 成長は「貢献」とセットじゃ！スキルアップをどう会社に還元するか語るんじゃ！\n\n入社後3年間は、貴社の〇〇分野で専門知識を徹底的に学び、まずは一人前のエキスパートとして貢献します。5年後には、その専門性を活かして新しい技術の導入を牽引し、最終的には技術開発部門のリーダーとして、貴社の技術力を世界レベルに引き上げたいです。`,
             `**【サンプル2：マネジメント志向パターン】**\nキャリ爺: マネジメントは現場経験が必須じゃ！どうやって現場の知識を深めるかを最初に語るんじゃ！\n\n最初の数年で、現場の業務知識を深く理解した上で、早期にチームリーダーとしてマネジメントに挑戦したいです。5年後には、複数のチームを束ねるマネージャーとして、組織全体の生産性向上に貢献できる人材になりたいと考えています。`,
@@ -792,9 +797,9 @@ const questionsData = {
         example_simple: "アルバイトで新企画を成功させたときです。目標を達成するためにチーム一丸となって努力し、大きな達成感を得ました。",
         sample: [
             `**【サンプル1：目標達成型パターン】**\nキャリ爺: 達成感の裏にある「戦略」を見せるんじゃ！感情だけでなく、論理的な努力を語るんじゃぞ！\n\n大学受験での第一志望合格です。模試の結果が振るわなかった際も、単に勉強時間を増やすだけでなく、苦手分野の徹底分析と効率的な学習計画に切り替えました。結果、合格を勝ち取り、目標達成のために冷静に戦略を練る重要性を学びました。`,
-            `**【サンプル2：チーム貢献型パターン】**\nキャリ爺: チーム一丸となった達成感は、入社後の協調性をアピールする最大の武器じゃ！\n\nサークル活動で、長年の課題だった地域イベントへの参加を実現させたことです。関係者との交渉、メンバーの意見調整など多くの困難がありましたが、チーム全員が役割を全うし、イベントを成功させた時の達成感は忘れられません。`,
-            `**【サンプル3：困難克服型パターン】**\nキャリ爺: 言葉の壁を乗り越えた経験は、適応力の証明じゃ！どうやって信頼関係を築いたかを語るんじゃ！\n\n海外ボランティア活動中に、言葉の壁や文化の違いからコミュニケーションが取れず、孤立した経験です。私は諦めず、非言語コミュニケーションや現地の言語を熱心に学び、最終的に現地の方々との信頼関係を構築し、目標を達成できました。`,
-            `**【サンプル4：数値結果改善型パターン】**\nキャリ爺: 自分の分析や提案が、明確な数値となって現れた瞬間は最高の達成感じゃ！\n\n長期インターンで任されたWebサイトの**顧客転換率(CVR)を2倍に改善**したことです。既存の施策では限界があると感じ、自らユーザーインタビューを企画・実施。定量データと定性データの両方に基づき、サイト構成を一から見直しました。自分の分析と提案が、明確な数値となって現れた瞬間に、大きな達成感を覚えました。`,
+            `**【サンプル2：チーム貢献型パターン】\nキャリ爺: チーム一丸となった達成感は、入社後の協調性をアピールする最大の武器じゃ！\n\nサークル活動で、長年の課題だった地域イベントへの参加を実現させたことです。関係者との交渉、メンバーの意見調整など多くの困難がありましたが、チーム全員が役割を全うし、イベントを成功させた時の達成感は忘れられません。`,
+            `**【サンプル3：困難克服型パターン】\nキャリ爺: 言葉の壁を乗り越えた経験は、適応力の証明じゃ！どうやって信頼関係を築いたかを語るんじゃ！\n\n海外ボランティア活動中に、言葉の壁や文化の違いからコミュニケーションが取れず、孤立した経験です。私は諦めず、非言語コミュニケーションや現地の言語を熱心に学び、最終的に現地の方々との信頼関係を構築し、目標を達成できました。`,
+            `**【サンプル4：数値結果改善型パターン】\nキャリ爺: 自分の分析や提案が、明確な数値となって現れた瞬間は最高の達成感じゃ！\n\n長期インターンで任されたWebサイトの**顧客転換率(CVR)を2倍に改善**したことです。既存の施策では限界があると感じ、自らユーザーインタビューを企画・実施。定量データと定性データの両方に基づき、サイト構成を一から見直しました。自分の分析と提案が、明確な数値となって現れた瞬間に、大きな達成感を覚えました。`,
         ],
         checklist: ["達成感の根拠となる努力を具体的に語った", "プロセスから得られた教訓を明確にした", "話に熱意が込められていたか確認した"],
         prompt_focus: "【達成感の経験へのフィードバック依頼】\n[質問: 今までで一番達成感を感じたことは何ですか?]\n\n以下の私の回答に対して、感情的な達成感だけでなく、その経験が私の仕事への取り組み方や問題解決能力を証明しているかについてフィードバックをください。",
@@ -811,7 +816,6 @@ const questionsData = {
         chara_think_text: "面接官は、君が普段から『社会』や『業界』に関心を持っているか、その『情報感度』と、ニュースに対する『自分の意見』を持っているかを知りたいんじゃ。",
         meister_think_text: "この質問は、あなたが普段から『社会』や『業界』に関心を持っているか、その『情報感度』と、ニュースに対する『自分の意見』を持っているかを知りたいという意図があります。企業や業界に関連性の高いニュースを選び、自分の考えを論理的に伝えましょう。",
         chara_example_intro: "キャリ爺が「回答例」を教えるぞ！",
-        ai_chara_title: "よーし、君の回答をまずは、書いてみよう。<br>大丈夫です、「AIお助けマン」がサポートしますよ！",
         description: "社会への関心度、論理的思考力、そしてそのニュースと企業・業界との関連性を測る。",
         points: ["応募企業や業界に関連性の高いニュースを選ぶと良い。", "単にニュースを説明するだけでなく、「それに対する自分の意見」と「会社としてどう対応すべきか」を述べる。", "政治や宗教など、センシティブなテーマは避けるのが無難。"],
         example_simple: "〇〇業界におけるAI技術の進化に注目しています。貴社の事業にも大きな影響があると見ています。",
@@ -827,7 +831,7 @@ const questionsData = {
             `**【サンプル4：働き方改革・組織活性化型】**\nキャリ爺: 会社の「内側」への関心は、入社後の定着意欲を示すぞ！どう「組織」を良くしたいかを語るんじゃ！\n\n(ニュース)大手企業で導入が進む「週休3日制」や「フルリモートワーク」など、多様な働き方に関するニュースです。(意見)生産性を維持しつつ社員のエンゲージメントを高めるという、現代の企業が直面する大きな課題だと捉えています。(会社との関連)貴社が推進されている**「社員の挑戦を評価する制度」**と合わせ、より柔軟な勤務体系を設計することで、優秀な人材の獲得と定着に繋がると考えます。私は、大学で学んだ**組織行動学の知見**を活かし、新しい人事制度の設計にも積極的に関わりたいです。`,
 
             // ★★★ 追加事例 5 (Day 12) ★★★
-            `**【サンプル5：国際情勢・サプライチェーン型】**\nキャリ爺: グローバルな視点を持っておるな！危機管理能力と、どう「リスク」を回避するかを見せるんじゃ！\n\n(ニュース)世界的な半導体不足が解消されない問題と、それに伴うサプライチェーンの混乱です。(意見)これは単なる部品不足ではなく、地政学的リスクを含む複雑な問題であり、企業の生産計画と在庫管理の抜本的な見直しが必要だと考えています。(会社との関連)貴社の製造部門においては、この影響を最小限に抑えるため、**部品のマルチサプライヤー化や国内生産の強化**が重要です。私は**緻密なスケジュール管理力**を活かし、購買・ロジスティクス部門でのリスク分散計画に貢献します。`
+            `**【サンプル5：国際情勢・サプライチェーン型】**\nキャリ爺: グローバルな視点を持っておるな！危機管理能力と、どう「リスク」を回避するかを見せるんじゃ！\n\n(ニュース)世界的な半導体不足が解消されない問題と、それに伴うサプライチェーンの混乱です。(意見)これは単なる部品不足ではなく、地政学的リスクを含む複雑な問題であり、企業の生産計画と在庫管理の抜本的な見直しが必要だと考えています。(会社との関連)貴社の製造部門においては、この影響を最小限に抑えるため、**部品のマルチサプライヤー化や国内生産の強化**が重要ですし、私は**緻密なスケジュール管理力**を活かし、購買・ロジスティクス部門でのリスク分散計画に貢献します。`
         ],
         checklist: ["ニュースの内容を正しく理解しているか確認した", "自分の意見を明確に述べた", "応募企業との関連性を示せた"],
         prompt_focus: "【ニュースへの意見へのフィードバック依頼】\n[質問: 最近気になるニュースや社会問題はありますか?]\n\n以下の私の回答に対して、ニュースの分析の深さ、自分の意見の論理性、そして回答が単なる情報提供で終わっていないか(意見や提言があるか)についてフィードバックをください。",
@@ -964,6 +968,9 @@ const categories = {
     good: [8, 11, 12, 14, 15] // 12と14は入れ替わっても、Day番号としてはこの配列に存在する
 };
 
+// ** 初期再生スピードの定数 **
+const INITIAL_SPEED = 1.2;
+
 let currentDay = 0;
 let currentNavTab = 'daily';
 let currentCategory = 'core';
@@ -984,9 +991,6 @@ const contentContainer = document.getElementById('content-container');
 const progressBarFill = document.getElementById('progress-bar-fill');
 const progressText = document.getElementById('progress-text');
 let mainAudio = document.getElementById('main-audio');
-
-// --- ( formatTime 関数 ) ---
-// 既に定義済み
 
 // --- ( renderDayContent 関数 ) ---
 const renderDayContent = (day) => {
@@ -1145,7 +1149,7 @@ const renderDayContent = (day) => {
                     
                     <div id="main-speed-controls" class="flex gap-1 text-sm bg-white p-1 rounded-full border">
                         <button data-speed="0.8" class="main-speed-btn py-0.5 px-2 rounded-full text-gray-600 hover:bg-indigo-50 transition">0.8x</button>
-                        <button data-speed="1.0" class="main-speed-btn py-0.5 px-2 rounded-full bg-indigo-100 text-indigo-600 font-bold shadow-sm transition">1.0x</button>
+                        <button data-speed="1.0" class="main-speed-btn py-0.5 px-2 rounded-full text-gray-600 hover:bg-indigo-50 transition">1.0x</button>
                         <button data-speed="1.2" class="main-speed-btn py-0.5 px-2 rounded-full text-gray-600 hover:bg-indigo-50 transition">1.2x</button>
                         <button data-speed="1.5" class="main-speed-btn py-0.5 px-2 rounded-full text-gray-600 hover:bg-indigo-50 transition">1.5x</button>
                     </div>
@@ -1168,8 +1172,10 @@ const renderDayContent = (day) => {
                     <p class="mt-2 p-3 bg-white rounded-lg border text-gray-700 whitespace-pre-wrap">${data.example_simple.replace(/\n/g, '<br>')}</p>
                 </div>
 
+                <!-- ★★★ アコーディオン形式のサンプル表示エリア ★★★ -->
                 <div id="accordion-samples-container" class="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg text-sm space-y-2">
-                    </div>
+                    <!-- アコーディオン要素がJSで動的に追加される -->
+                </div>
             </div>
 
             ${aiCharaHtml}
@@ -1228,13 +1234,19 @@ const initAudioPlayer = (source) => {
     }
     mainAudio.src = source;
     mainAudio.load();
-    mainAudio.playbackRate = 1.0;
     
-    document.querySelectorAll('.main-speed-btn').forEach(b => {
+    // ★修正点1: 初期再生レートを1.2倍速に設定
+    mainAudio.playbackRate = INITIAL_SPEED;
+    
+    const speedControls = document.querySelectorAll('.main-speed-btn');
+
+    // ★修正点2: 1.2xボタンをアクティブにする処理
+    speedControls.forEach(b => {
         b.classList.remove('bg-indigo-100', 'text-indigo-600', 'font-bold', 'shadow-sm');
         b.classList.add('text-gray-600', 'hover:bg-indigo-50');
-        if (b.dataset.speed === '1.0') {
+        if (parseFloat(b.dataset.speed) === INITIAL_SPEED) {
             b.classList.add('bg-indigo-100', 'text-indigo-600', 'font-bold', 'shadow-sm');
+            b.classList.remove('text-gray-600', 'hover:bg-indigo-50');
         }
     });
 
@@ -1243,7 +1255,6 @@ const initAudioPlayer = (source) => {
     const durationEl = document.getElementById('main-duration');
     const progressBarContainer = document.getElementById('main-progress-bar-container');
     const progressBarFill = document.getElementById('main-progress-bar-fill');
-    const speedControls = document.querySelectorAll('.main-speed-btn');
     
     playPauseBtn.onclick = null;
     progressBarContainer.onclick = null;
@@ -1675,7 +1686,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const practiceTimerBarElement = document.getElementById('practice-timer-bar');
     const stopPracticeBtnElement = document.getElementById('stop-practice');
     const nextPracticeBtnElement = document.getElementById('next-practice-question');
-    // グローバル変数に代入
+    // グローバル変数に代入 (DOMContentLoaded外で定義されているため、ここではconst/letを付けない)
     practiceModal = practiceModalElement;
     practiceQuestionCount = practiceQuestionCountElement;
     practiceQuestionTitle = practiceQuestionTitleElement;
@@ -1689,6 +1700,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // リセットボタンのイベントリスナーを追加
     const resetButton = document.getElementById('reset-data-button');
     if (resetButton) {
+        // ★修正点5: イベントリスナーを確実に登録
         resetButton.addEventListener('click', resetData);
     }
     
@@ -1761,7 +1773,8 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.appendChild(installBtn);
         });
     };
-
+    
+    // ★修正点4: モーダルボタンへのイベントリスナー登録をDOM取得直後に実行
     selectKyarijii.addEventListener('click', () => initializeApp('kyarijii'));
     selectNormal.addEventListener('click', () => initializeApp('normal'));
 });
@@ -1797,6 +1810,9 @@ const initIntroAudioPlayer = () => {
     const introSpeedControls = document.querySelectorAll('#intro-speed-controls .speed-btn');
 
     if (playIntroBtn && introAudio) {
+        // ★修正点3: プログラム紹介音声の初期再生レートを1.2倍速に設定
+        introAudio.playbackRate = INITIAL_SPEED;
+
         playIntroBtn.addEventListener('click', () => {
             if (introAudio.paused) {
                 introAudio.play();
@@ -1812,8 +1828,17 @@ const initIntroAudioPlayer = () => {
         };
 
         introSpeedControls.forEach(btn => {
+            const speed = parseFloat(btn.dataset.speed);
+            // UIの初期状態を設定 (DOMの初期HTMLと合わせる)
+            if (speed === INITIAL_SPEED) {
+                btn.classList.add('bg-white', 'text-indigo-600', 'font-bold', 'shadow-sm');
+                btn.classList.remove('text-gray-600', 'hover:bg-white');
+            } else {
+                 btn.classList.remove('bg-white', 'text-indigo-600', 'font-bold', 'shadow-sm');
+                 btn.classList.add('text-gray-600', 'hover:bg-white');
+            }
+            
             btn.addEventListener('click', () => {
-                const speed = parseFloat(btn.dataset.speed);
                 introAudio.playbackRate = speed;
                 
                 introSpeedControls.forEach(b => {
@@ -1942,7 +1967,7 @@ const showPracticeQuestion = () => {
     practiceTimer.textContent = formatTime(practiceTimerSeconds); // formatTimeは既存の関数を使用
     practiceTimer.classList.remove('text-red-500');
     practiceTimerBar.style.width = '100%';
-    practiceTimerBar.classList.remove('bg-red-500');
+    practiceTimerBar.classList.remove('bg-blue-500');
     practiceTimerBar.classList.add('bg-blue-500');
     
     // ボタンのテキストをリセット
@@ -2054,7 +2079,7 @@ const startPracticeTimer = () => {
             <button id="next-practice-question" class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-3 px-6 sm:px-8 rounded-lg transition shadow-md text-lg">
                 タイマースタート
             </button>
-        </div>
+        </div>a
     </div>
 </div>
 </body>
